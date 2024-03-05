@@ -1,0 +1,177 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "ingressAppGatewayName": {
+            "defaultValue": "ingress-appgateway",
+            "type": "String"
+        },
+        "vnetName": {
+            "type": "String"
+        },
+        "appGatewayPublicIpName": {
+            "defaultValue": "ingress-appgateway-appgwpip",
+            "type": "String"
+        }
+    },
+    "variables": {
+        "vnetResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
+        "appGatewayPublicIpResourceId": "[resourceId(resourceGroup().name, 'Microsoft.Network/publicIPAddresses', parameters('appGatewayPublicIpName'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/applicationGateways",
+            "apiVersion": "2023-02-01",
+            "name": "[parameters('ingressAppGatewayName')]",
+            "location": "eastus",
+            "tags": {
+                "created-by": "Cope Preprod Team",
+                "managed-by-k8s-ingress": "1.7.2/5361cbbd/2023-07-19-18:29T+0000"
+            },
+            "properties": {
+                "sku": {
+                    "name": "Standard_v2",
+                    "tier": "Standard_v2",
+                    "capacity": 2
+                },
+                "gatewayIPConfigurations": [
+                    {
+                        "name": "appGatewayIpConfig",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/gatewayIPConfigurations/appGatewayIpConfig')]",
+                        "properties": {
+                            "subnet": {
+                                "id": "[concat(variables('vnetResourceId'), concat('/subnets/', parameters('ingressAppGatewayName'), '-subnet'))]"
+                            }
+                        }
+                    }
+                ],
+                "sslCertificates": [],
+                "trustedRootCertificates": [],
+                "trustedClientCertificates": [],
+                "sslProfiles": [],
+                "frontendIPConfigurations": [
+                    {
+                        "name": "appGatewayFrontendIP",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/frontendIPConfigurations/appGatewayFrontendIP')]",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[variables('appGatewayPublicIpResourceId')]"
+                            }
+                        }
+                    }
+                ],
+                "frontendPorts": [
+                    {
+                        "name": "httpPort",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/frontendPorts/httpPort')]",
+                        "properties": {
+                            "port": 80
+                        }
+                    }
+                ],
+                "backendAddressPools": [
+                    {
+                        "name": "defaultaddresspool",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/backendAddressPools/defaultaddresspool')]",
+                        "properties": {
+                            "backendAddresses": []
+                        }
+                    }
+                ],
+                "loadDistributionPolicies": [],
+                "backendHttpSettingsCollection": [
+                    {
+                        "name": "defaulthttpsetting",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/backendHttpSettingsCollection/defaulthttpsetting')]",
+                        "properties": {
+                            "port": 80,
+                            "protocol": "Http",
+                            "cookieBasedAffinity": "Disabled",
+                            "pickHostNameFromBackendAddress": false,
+                            "requestTimeout": 30,
+                            "probe": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/probes/defaultprobe-Http')]"
+                            }
+                        }
+                    }
+                ],
+                "backendSettingsCollection": [],
+                "httpListeners": [
+                    {
+                        "name": "fl-452c578b4f742bd7a3927c3caf2b604e",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/httpListeners/fl-452c578b4f742bd7a3927c3caf2b604e')]",
+                        "properties": {
+                            "frontendIPConfiguration": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/frontendIPConfigurations/appGatewayFrontendIP')]"
+                            },
+                            "frontendPort": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/frontendPorts/httpPort')]"
+                            },
+                            "protocol": "Http",
+                            "hostNames": [],
+                            "requireServerNameIndication": false
+                        }
+                    }
+                ],
+                "listeners": [],
+                "urlPathMaps": [],
+                "requestRoutingRules": [
+                    {
+                        "name": "rr-452c578b4f742bd7a3927c3caf2b604e",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/requestRoutingRules/rr-452c578b4f742bd7a3927c3caf2b604e')]",
+                        "properties": {
+                            "ruleType": "Basic",
+                            "priority": 19500,
+                            "httpListener": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/httpListeners/fl-452c578b4f742bd7a3927c3caf2b604e')]"
+                            },
+                            "backendAddressPool": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/backendAddressPools/defaultaddresspool')]"
+                            },
+                            "backendHttpSettings": {
+                                "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/backendHttpSettingsCollection/defaulthttpsetting')]"
+                            }
+                        }
+                    }
+                ],
+                "routingRules": [],
+                "probes": [
+                    {
+                        "name": "defaultprobe-Http",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/probes/defaultprobe-Http')]",
+                        "properties": {
+                            "protocol": "Http",
+                            "host": "localhost",
+                            "path": "/",
+                            "interval": 30,
+                            "timeout": 30,
+                            "unhealthyThreshold": 3,
+                            "pickHostNameFromBackendHttpSettings": false,
+                            "minServers": 0,
+                            "match": {}
+                        }
+                    },
+                    {
+                        "name": "defaultprobe-Https",
+                        "id": "[concat(resourceId('Microsoft.Network/applicationGateways', parameters('ingressAppGatewayName')), '/probes/defaultprobe-Https')]",
+                        "properties": {
+                            "protocol": "Https",
+                            "host": "localhost",
+                            "path": "/",
+                            "interval": 30,
+                            "timeout": 30,
+                            "unhealthyThreshold": 3,
+                            "pickHostNameFromBackendHttpSettings": false,
+                            "minServers": 0,
+                            "match": {}
+                        }
+                    }
+                ],
+                "rewriteRuleSets": [],
+                "redirectConfigurations": [],
+                "privateLinkConfigurations": []
+            }
+        }
+    ]
+}

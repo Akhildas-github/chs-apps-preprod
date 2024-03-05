@@ -1,0 +1,113 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "eastus"
+        },
+        "managedInstanceName": {
+            "value": "sql-copearc-preprod-eu01"
+        },
+        "skuName": {
+            "value": "GP_Gen5"
+        },
+        "skuEdition": {
+            "value": "GeneralPurpose"
+        },
+        "storageSizeInGB": {
+            "value": 256
+        },
+        "vCores": {
+            "value": 8
+        },
+        "licenseType": {
+            "value": "LicenseIncluded"
+        },
+        "hybridSecondaryUsage": {
+            "value": "Active"
+        },
+        "hardwareFamily": {
+            "value": "Gen5"
+        },
+        "dnsZonePartner": {
+            "value": ""
+        },
+        "collation": {
+            "value": "SQL_Latin1_General_CP1_CI_AS"
+        },
+        "proxyOverride": {
+            "value": "Proxy"
+        },
+        "minimalTlsVersion": {
+            "value": "1.2"
+        },
+        "publicDataEndpointEnabled": {
+            "value": false
+        },
+        "timezoneId": {
+            "value": "UTC"
+        },
+        "nsgForPublicEndpoint": {
+            "value": "allowFromAzureCloudTo3342NSG"
+        },
+        "managedInstanceTags": {
+            "value": {}
+        },
+        "requestedBackupStorageRedundancy": {
+            "value": "Geo"
+        },
+        "zoneRedundant": {
+            "value": false
+        },
+        "deployInExistingSubnet": {
+            "value": true
+        },
+        "virtualNetworkResourceGroupName": {
+            "value": "rg-copearc-preprod-01"
+        },
+        "virtualNetworkName": {
+            "value": "vnet-chs-copearc-preprod-01"
+        },
+        "subnetName": {
+            "value": "subnet-chs-copearc-preprod-01"
+        },
+        "enableADS": {
+            "value": false
+        },
+        "enableVA": {
+            "value": false
+        },
+        "pricingModel": {
+            "value": "Regular"
+        },
+        "identity": {
+            "value": {
+                "type": "SystemAssigned"
+            }
+        },
+        "primaryUserAssignedIdentityId": {
+            "value": ""
+        },
+        "federatedClientId": {
+            "value": ""
+        },
+        "servicePrincipal": {
+            "value": {
+                "type": "None"
+            }
+        },
+        "maintenanceConfigurationId": {
+            "value": "/subscriptions/6f03eba7-0eca-4fa7-b97a-c9f0b9fa9b68/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default"
+        },
+        "administrators": {
+            "value": {
+                "administratorType": "activeDirectory",
+                "login": "rairala.dasu@copehealthsolutions.com",
+                "sid": "2c5676ea-848d-4aff-a522-85c597f04aa9",
+                "tenantId": "a2aefdb9-e160-4dc7-ad5b-3dbc67c23815",
+                "azureADOnlyAuthentication": true,
+                "principalType": "User"
+            }
+        }
+    }
+}
